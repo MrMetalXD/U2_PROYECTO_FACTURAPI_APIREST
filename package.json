@@ -1,0 +1,17 @@
+{
+  "name": "u2_proyecto_facturapi_apirest",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "express": "^4.21.2",
+    "facturapi": "^4.4.2",
+    "mongoose": "^8.8.4"
+  }
+}
