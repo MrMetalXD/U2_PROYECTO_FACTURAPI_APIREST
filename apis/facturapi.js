@@ -1,30 +1,32 @@
 const Facturapi = require('facturapi').default;
 
-const facturapi = new Facturapi("sk_test_2NbGV0oEzXwqaA9Jdv4va2o4qPW148mLD5YenKxP6j");
+const facturapi = new Facturapi("sk_test_7wqPxEe9nl6mdoz0Kjawb9PbPEWZbYOGLp3k5a1M28");
 
 
 async function createProduct(product){
-    const facturapiProduct = {
-        description: product.description,
-        product_key: "50202306",
-        price: product.price
-    };
+  const facturapiProduct = {
+    description: product.description,
+    product_key: "50202306",
+    price: product.price 
+};
     return await facturapi.products.create(facturapiProduct);
 };
 
 async function createCustomer(user) {
-    return await facturapi.customers.create({
-      legal_name: user.nombreCompleto,
-      email: user.email,
-      tax_id: user.rfc || "XAXX010101000", // Usa un RFC de prueba si no se proporciona uno real
-      tax_system: "601", // Código del régimen fiscal (modifica según sea necesario)
-      address: {
-        street: user.direccion || "",
-        zip: "12345" // Ajusta el código postal según sea necesario
-      },
-      phone: user.telefono
-    });
-  }
+  return await facturapi.customers.create({
+    legal_name: user.nombreCompleto, 
+    email: user.email,
+    tax_id: user.rfc || 'XAXX010101000', 
+    tax_system: '601', 
+    address: {
+      street: user.direccion.calle || '',
+      zip: user.direccion.zip || '', 
+      municipality: user.direccion.municipio || '',
+      state: user.direccion.estado || '',
+    },
+    phone: user.telefono || '',
+  });
+}
 
 
   async function updateCustomer(facturapiId, user) {
