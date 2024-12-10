@@ -30,5 +30,5 @@ const sendEmail = async (email, subject, htmlContent) => {
         console.error('Error al enviar el correo:', error.response ? error.response.body : error);
     }
 };
-
+//cambios
 module.exports = { sendEmail };

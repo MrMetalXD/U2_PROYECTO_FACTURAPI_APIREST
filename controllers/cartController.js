@@ -57,7 +57,7 @@ addProductToCart: async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 },
-
+//cambios
 updateCartProducts: async (req, res) => {
   try {
     const { id } = req.params; // ID del carrito

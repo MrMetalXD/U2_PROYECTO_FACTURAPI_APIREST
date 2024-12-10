@@ -9,7 +9,7 @@
                 res.status(500).json({ error: error.message });
             }
         },
-        
+        //cambios
         createProduct : async (req, res) => {
             try {
                 const args = req.body; // Datos del producto desde el cuerpo de la solicitud

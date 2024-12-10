@@ -18,7 +18,7 @@ const productService = {
     if (!mongoose.Types.ObjectId.isValid(_id)) {
       throw new Error('El ID proporcionado no es válido');
     }
-
+//cambios
     const productId = new mongoose.Types.ObjectId(_id);
     const productToUpdate = await Product.findById(productId);
     if (!productToUpdate) throw new Error('Producto no encontrado');

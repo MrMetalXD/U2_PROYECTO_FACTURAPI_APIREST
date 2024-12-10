@@ -6,7 +6,7 @@ cloudinary.config({
   api_key: '584133766519467',       
   api_secret: 'IEYkGd2DhBGK-5oczFqiInYHlj0', 
 });
-
+//cambios
 async function subirArchivoCloudinary(rutaArchivo) {
   try {
     console.log(`Subiendo archivo ${rutaArchivo} a Cloudinary...`);

@@ -10,7 +10,7 @@ const userController = {
       res.status(500).json({ error: 'Error al obtener los usuarios' });
     }
   },
-
+//cambios
   getUserById: async (req, res) => {
     try {
       const user = await userService.getUserById(req.params.id);

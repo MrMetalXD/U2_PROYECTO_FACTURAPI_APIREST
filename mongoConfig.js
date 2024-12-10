@@ -8,7 +8,7 @@ async function connectDB() {
     } catch (error) {
         console.log("MongoDB connection failed ", error);
     }
-}
+}//cambios
 
 module.exports = connectDB;
 

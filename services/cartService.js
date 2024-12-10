@@ -149,7 +149,7 @@ const cartService = {
     cart.subtotal = subtotal || 0; // Garantizar un valor numérico
     cart.iva = iva || 0;
     cart.total = total || 0;
-  
+  //cambios
     // Guardar el carrito actualizado
     await cart.save();
   
