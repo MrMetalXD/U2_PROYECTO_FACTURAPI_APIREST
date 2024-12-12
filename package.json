@@ -1,0 +1,21 @@
+{
+  "name": "u2_proyecto_facturapi_apirest",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "cloudinary": "^2.5.1",
+    "express": "^4.21.2",
+    "facturapi": "^4.4.2",
+    "mongodb": "^5.9.2",
+    "mongoose": "^6.13.5",
+    "node-mailjet": "^6.0.6",
+    "stripe": "^17.4.0"
+  }
+}
