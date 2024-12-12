@@ -19,6 +19,31 @@
     }
     return product;
   }
+  const formatProductForInvoice = (item) => {
+    try {
+      const priceWithoutTax = item.producto.price / 1.16; // Precio sin IVA
+      const iva = priceWithoutTax * 0.16; // IVA del 16%
+  
+      return {
+        quantity: item.cantidad,
+        product: {
+          description: item.producto.name,
+          product_key: '60131324',
+          price: priceWithoutTax,
+          tax_included: false,
+          taxes: [
+            {
+              rate: 0.16, // IVA del 16%
+              type: 'IVA',
+            },
+          ],
+        },
+      };
+    } catch (error) {
+      console.error(`Error al formatear el producto: ${item.producto?.name || 'Desconocido'}`, error);
+      throw new Error(`Error procesando el producto ${item.producto?.name || 'Desconocido'}`);
+    }
+  };
   function updateCartTotals(cart) {
     if (!cart.productos || !Array.isArray(cart.productos)) {
       cart.productos = []; // Inicializar si es undefined
@@ -279,61 +304,52 @@
       }
     },    
     // Emitir factura
-    async EmitirFactura(_, { id_carrito }) {
+    async EmitirFactura(id_carrito) {
       const cart = await Cart.findById(id_carrito).populate('usuario').populate('productos.producto');
-      if (!cart) {
-        throw new Error('Carrito no encontrado.');
-      }
-      if (cart.estatus !== 'cerrado') {
-        throw new Error('El carrito debe estar cerrado antes de emitir una factura.');
+      if (!cart) throw new Error('Carrito no encontrado.');
+      if (cart.estatus !== 'cerrado') throw new Error('El carrito debe estar cerrado antes de emitir una factura.');
+    
+      const user = cart.usuario;
+    
+      if (!user || !cart.productos.length) {
+        throw new Error('Faltan datos de usuario o productos en el carrito.');
       }
     
       try {
-        const user = cart.usuario;
+        // Formatear productos para FacturAPI
+        const items = cart.productos.map((item) => formatProductForInvoice(item));
     
-        // Formatear los productos para FacturAPI
-        const items = cart.productos.map((item) => {
-          const priceWithoutTax = item.producto.price / 1.16; // Precio sin IVA
-          const iva = priceWithoutTax * 0.16; // IVA del 16%
-    
-          return {
-            quantity: item.cantidad,
-            product: {
-              description: item.producto.name,
-              product_key: '60131324',
-              price: priceWithoutTax,
-              tax_included: false,
-              taxes: [{ rate: 0.16, type: 'IVA' }],
-            },
-          };
-        });
-    
+        // Crear la factura en FacturAPI
         const factura = await facturapi.invoices.create({
           customer: {
             legal_name: user.nombreCompleto,
             email: user.email,
-            tax_id: 'XAXX010101000',
-            tax_system: '601',
+            tax_id: 'XAXX010101000', // Si el RFC es ficticio, asegúrate de manejarlo adecuadamente.
+            tax_system: '601', // Si el régimen fiscal es diferente, actualiza este valor.
             address: {
-              street: user.direccion.calle || '',
-              zip: String(user.direccion.zip) || '',
-              municipality: user.direccion.municipio || '',
-              state: user.direccion.estado || '',
+              street: user.direccion?.calle || '',
+              zip: String(user.direccion?.zip || ''),
+              municipality: user.direccion?.municipio || '',
+              state: user.direccion?.estado || '',
             },
             phone: user.telefono || '',
           },
           items,
-          payment_form: '03',
-          folio_number: Math.floor(Math.random() * 10000),
-          series: 'F',
+          payment_form: '03', // Formato de pago (Ejemplo: '03' para transferencia bancaria)
+          folio_number: Math.floor(Math.random() * 10000), // Número de folio aleatorio
+          series: 'F', // Serie de la factura
         });
     
+        // Asegurar que la factura esté en estado de borrador
         let draftFactura = factura;
         if (factura.status !== 'draft') {
           draftFactura = await facturapi.invoices.copyToDraft(factura.id);
         }
     
+        // Timbrar la factura
         const facturaTimbrada = await facturapi.invoices.stampDraft(draftFactura.id);
+    
+        // Descargar PDF
         const pdfStream = await facturapi.invoices.downloadPdf(facturaTimbrada.id);
         const localPath = `./factura-${facturaTimbrada.id}.pdf`;
         const pdfFile = fs.createWriteStream(localPath);
@@ -344,19 +360,21 @@
           pdfFile.on('error', reject);
         });
     
+        // Subir archivo a Cloudinary
         const cloudinaryUrl = await subirArchivoCloudinary(localPath);
-        fs.unlinkSync(localPath);
+        fs.unlinkSync(localPath); // Eliminar el archivo PDF local después de subirlo
     
+        // Retornar información de la factura
         return {
           message: 'Factura generada, timbrada y almacenada exitosamente en Cloudinary.',
           facturaId: facturaTimbrada.id,
           facturaUrl: cloudinaryUrl,
         };
       } catch (error) {
-        console.error('Error generando factura:', error);
+        console.error('Error generando factura:', error.message || error);
         throw new Error('No se pudo generar la factura. Intenta nuevamente.');
       }
-    },    
+    }    
   };
 
   module.exports = cartService;

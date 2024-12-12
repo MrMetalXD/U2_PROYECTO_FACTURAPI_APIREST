@@ -14,7 +14,7 @@ router.delete('/:id/productos', cartController.deleteProductFromCart); // Elimin
 router.post('/', cartController.createCart); // Crear un carrito nuevo
 router.post('/:id/productos', cartController.addProductToCart);
 router.post('/:id/process-payment', cartController.procesarPagoYCerrarCarrito);
-router.post('/:id/issue-invoice', cartController.emitirFactura); // Emitir factura
+router.post('/:id/issue-invoice', cartController.emitirFactura);
 
 
 
